@@ -1,0 +1,45 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <form action="/addtask" method="post">
+    <input type="text" name="task" placeholder="Add a task" required>
+    <button type="submit">Add</button>
+  </form>
+  <ul id="tasks"></ul>
+  <script>
+    fetch('/tasks')
+      .then(response => response.json())
+      .then(tasks => {
+        const tasksList = document.getElementById('tasks');
+        tasksList.innerHTML = '';
+        tasks.forEach((task, index) => {
+          const li = document.createElement('li');
+          li.textContent = task;
+          const removeButton = document.createElement('button');
+          removeButton.textContent = 'Remove';
+          removeButton.addEventListener('click', () => {
+            fetch('/removetask', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ index })
+            })
+            .then(() => {
+              li.remove();
+            });
+          });
+          li.appendChild(removeButton);
+          tasksList.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
